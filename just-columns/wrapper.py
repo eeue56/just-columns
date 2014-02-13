@@ -9,27 +9,34 @@ path_maps = {
 }
 
 class get(object):
-    def __init__(self, path):
+    def __init__(self, path, names=None):
         global path_maps
+
         self.path = path
         path_maps[path] = self
         self.function = None
 
+        if names is None:
+            names = []
+        
+        self.argument_names = names
+        
+
         
     def __call__(self, *args, **kwargs):
         global path_maps
-        print('recalling')
 
         if len(args) > 0:
             self.function = args[0]
-        
-        print('function is ', self.function.__name__)
-        
+                
         def funct(self_, *args, **kwargs):
-            print('being called..')
-            stuff = self.function()
+
+            arguments = {name : self_.get_arguments(name) for name in self.argument_names}
+            
+            kwargs['arguments'] = arguments
+
+            stuff = self.function(self_, *args, **kwargs)
             self_.write(stuff)
-            print('written')
 
         path_maps[self.path] = funct
         return funct
