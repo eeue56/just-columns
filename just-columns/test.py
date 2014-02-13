@@ -4,7 +4,7 @@ import requests
 
 
 @get('/')
-def f():
+def f(*args, **kwargs):
     return 'Hello!'
 
 def test():

@@ -8,7 +8,6 @@ path_maps = {
     
 }
 
-
 class get(object):
     def __init__(self, path):
         global path_maps
@@ -18,6 +17,7 @@ class get(object):
 
         
     def __call__(self, *args, **kwargs):
+        global path_maps
         print('recalling')
 
         if len(args) > 0:
@@ -25,18 +25,14 @@ class get(object):
         
         print('function is ', self.function.__name__)
         
-        def func(self_, *args, **kwargs):
+        def funct(self_, *args, **kwargs):
             print('being called..')
             stuff = self.function()
             self_.write(stuff)
             print('written')
-            return stuff
 
-        if len(args) < 1:
-            pass #return None# tornado.concurrent.return_future(func)
-
-
-        return func
+        path_maps[self.path] = funct
+        return funct
 
 
 def paths_to_handlers():
@@ -45,9 +41,12 @@ def paths_to_handlers():
     handlers = []
 
     for path, handler in path_maps.items():
-        handler_class = type(path, 
-            (tornado.web.RequestHandler, object), 
-            dict(get=handler))
+        handler_class = type(
+                            path + 'Handler', 
+                            (tornado.web.RequestHandler, object), 
+                            dict(get=handler)
+        )
+
 
         handlers.append((path, handler_class))
 
